@@ -1,5 +1,8 @@
 package org.ohgiraffers.board.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.sql.Update;
 import org.ohgiraffers.board.domain.dto.*;
@@ -12,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 
 /* 레이어드 아키텍처
 * 소프트웨어를 여러개의 계층으로 분리해서 설계하는 방법
@@ -35,7 +39,7 @@ import org.springframework.web.bind.annotation.*;
 @ResponseBody
 @RestController
 // @RequestMapping : 특정 URL을 매핑하게 도와준다
-@RequestMapping("/api/v1/posts") // 1) 클라이언트에서 /api/v1/posts 경로로 POST 요청
+@RequestMapping("/api/v1/posts") // 1) 클라이언트 요청 /api/v1/posts 경로로 POST 요청
 // @RequiredArgsConstructor : final을 혹은 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성해준다
 @RequiredArgsConstructor
 public class PostController {
@@ -44,18 +48,20 @@ public class PostController {
 
 
     // 작성
-    @PostMapping // 2 HTTP POST 요청을 처리하는 메서드로 동작
-    public ResponseEntity<CreatePostResponse> postCreate( //2 postCreate 메서드로 매핑
-            @RequestBody CreatePostRequest request){ //2 메서드는 @RequestBody CreatePostRequest request를 파라미터로 받음
+    // 2) PostController의 postCreate 메서드:
+    @Tag(name = "게시물 작성", description = "Create")
+    @Operation(summary = "게시글 작성", description = "제목")
+    @PostMapping
+    public ResponseEntity<CreatePostResponse> postCreate(
+            @RequestBody CreatePostRequest request){ // 해당 메서드는 클라이언트가 보낸 데이터(title과 content)를 담은 CreatePostRequest 객체를 받는다
 
-        // 사용자가 request(title, content)보낸 걸 postService에 처리
-        // createPost에서 return
         CreatePostResponse response = postService.createPost(request);
+
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // 단건 조회
+    @Tag(name = "게시물 단건 조회", description = "Read")
     @GetMapping("/{postId}")
     public ResponseEntity<ReadPostResponse> postRead(@PathVariable Long postId){
         ReadPostResponse response = postService.readPostById(postId);
@@ -63,6 +69,8 @@ public class PostController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    //수정
+    @Tag(name = "게시물 수정", description = "Update")
     @PutMapping("/{postId}")
     public ResponseEntity<UpdatePostResponse> postUpdate(@PathVariable Long postId,
                                                          @RequestBody UpdatePostRequest request){
@@ -73,6 +81,7 @@ public class PostController {
     }
 
     // 삭제
+    @Tag(name = "게시물 삭제", description = "Delete")
     @DeleteMapping("/{postId}")
     public ResponseEntity<DeletePostResponse> postDelete(@PathVariable Long postId){
         DeletePostResponse response = postService.deletePost(postId);
@@ -81,6 +90,7 @@ public class PostController {
     }
 
     // 전체 조회
+    @Tag(name = "게시물 전체조회", description = "ReadAll")
     @GetMapping
     public ResponseEntity<Page<ReadPostResponse>> postReadAll(
             // 페이지처리할때 설정값

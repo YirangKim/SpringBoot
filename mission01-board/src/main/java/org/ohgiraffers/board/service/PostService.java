@@ -36,8 +36,10 @@ public class PostService {
 
     private final PostRepository postRepository;
 
+    // 3 PostService의 createPost 메서드 호출:
+    // createPost 메서드는 받은 데이터로 새로운 게시물을 만들고, 이를 데이터베이스에 저장합니다.
     @Transactional
-    public CreatePostResponse createPost(CreatePostRequest request){ //4 request호출 로직 실행
+    public CreatePostResponse createPost(CreatePostRequest request){
         Post post = Post.builder()
                 .title(request.getTitle())
                 .content(request.getContent())

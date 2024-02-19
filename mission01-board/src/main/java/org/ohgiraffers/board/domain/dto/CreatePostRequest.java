@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePostRequest { //3 DTO생성
+public class CreatePostRequest {
 
+    // 2) 해당 메서드는 클라이언트가 보낸 데이터(title과 content)를 담은 CreatePostRequest 객체를 받는다
     private String title;
     private String content;
 }
