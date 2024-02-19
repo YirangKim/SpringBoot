@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePostRequest { //3 DTO생성
+public class DeletePostResponse {
 
-    private String title;
-    private String content;
+    private Long postId;
+
 }

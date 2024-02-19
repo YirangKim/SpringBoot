@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public class CreatePostRequest { //3 DTO생성
+@AllArgsConstructor //필드 모든 변수 포함
+@NoArgsConstructor //기본 생성자
+public class ReadPostResponse {
 
+    private Long postId;
     private String title;
     private String content;
 }

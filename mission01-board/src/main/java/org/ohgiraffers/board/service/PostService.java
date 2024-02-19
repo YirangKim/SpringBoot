@@ -1,11 +1,13 @@
 package org.ohgiraffers.board.service;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.ohgiraffers.board.domain.dto.CreatePostRequest;
-import org.ohgiraffers.board.domain.dto.CreatePostResponse;
+import org.ohgiraffers.board.domain.dto.*;
 import org.ohgiraffers.board.domain.entity.Post;
 import org.ohgiraffers.board.repository.PostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public CreatePostResponse createPost(CreatePostRequest request){
+    public CreatePostResponse createPost(CreatePostRequest request){ //4 request호출 로직 실행
         Post post = Post.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
@@ -44,6 +46,49 @@ public class PostService {
         Post savePost = postRepository.save(post); //save return값을 돌려줌
 
         return new CreatePostResponse(savePost.getPostId(), savePost.getTitle(), savePost.getContent());
+    }
+
+    public ReadPostResponse readPostById(Long postId){
+
+        //postId있는지 없는지 체크
+        Post foundPost = postRepository.findById(postId)
+                    //예외 오류 처리
+                    .orElseThrow(() -> new EntityNotFoundException("해당 postId로 조회된 게시글이 없습니다"));
+
+        return new ReadPostResponse(foundPost.getPostId(), foundPost.getTitle(), foundPost.getContent());
+    }
+
+    @Transactional //DB commit .... 공부필요
+    // post맨은 반영, DB에 반영안됐던 문제 Transactional
+    public UpdatePostResponse updatePost(Long postId, UpdatePostRequest request){
+
+        // postId있는지 없는지 체크
+        Post foundPost = postRepository.findById(postId)
+                //예외 오류 처리
+                .orElseThrow(() -> new EntityNotFoundException("해당 postId로 조회된 게시글이 없습니다"));
+
+        // Dirty Checking
+        // 바꿔온 엔티티를 jps가 감지하고 바꿔줌
+        foundPost.update(request.getTitle(), request.getContent());
+        return new UpdatePostResponse(foundPost.getPostId(), foundPost.getTitle(), foundPost.getContent());
+    }
+
+    @Transactional
+    public DeletePostResponse deletePost(Long postId){
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 postId로 조회된 게시글이 없습니다"));
+        postRepository.delete(foundPost);
+        return new DeletePostResponse(foundPost.getPostId());
+    }
+
+    // 조회
+    public Page<ReadPostResponse> readAllPost(Pageable pageable){
+        Page<Post> postsPage = postRepository.findAll(pageable);
+        return postsPage.map(post -> new ReadPostResponse( //map 공부
+                post.getPostId(),
+                post.getTitle(),
+                post.getContent()
+        ));
     }
 
 }

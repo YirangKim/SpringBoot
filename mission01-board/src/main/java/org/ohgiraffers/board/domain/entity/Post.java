@@ -33,8 +33,12 @@ public class Post {
     @Id
     @GeneratedValue
     private Long postId;
-
     private String title;
     private String content;
+
+    public void update(String title, String content){
+        this.title = title;
+        this.content = content;
+    }
 
 }

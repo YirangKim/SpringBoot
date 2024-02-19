@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class CreatePostRequest { //3 DTO생성
-
+@AllArgsConstructor
+public class UpdatePostRequest {
     private String title;
     private String content;
 }

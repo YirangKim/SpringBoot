@@ -1,9 +1,13 @@
 package org.ohgiraffers.board.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.ohgiraffers.board.domain.dto.CreatePostRequest;
-import org.ohgiraffers.board.domain.dto.CreatePostResponse;
+import org.hibernate.sql.Update;
+import org.ohgiraffers.board.domain.dto.*;
 import org.ohgiraffers.board.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,21 +35,62 @@ import org.springframework.web.bind.annotation.*;
 @ResponseBody
 @RestController
 // @RequestMapping : 특정 URL을 매핑하게 도와준다
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/api/v1/posts") // 1) 클라이언트에서 /api/v1/posts 경로로 POST 요청
 // @RequiredArgsConstructor : final을 혹은 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성해준다
 @RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
-    @PostMapping
-    public ResponseEntity<CreatePostResponse> postCreate(@RequestBody CreatePostRequest request){
+
+    // 작성
+    @PostMapping // 2 HTTP POST 요청을 처리하는 메서드로 동작
+    public ResponseEntity<CreatePostResponse> postCreate( //2 postCreate 메서드로 매핑
+            @RequestBody CreatePostRequest request){ //2 메서드는 @RequestBody CreatePostRequest request를 파라미터로 받음
 
         // 사용자가 request(title, content)보낸 걸 postService에 처리
         // createPost에서 return
         CreatePostResponse response = postService.createPost(request);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
+    // 단건 조회
+    @GetMapping("/{postId}")
+    public ResponseEntity<ReadPostResponse> postRead(@PathVariable Long postId){
+        ReadPostResponse response = postService.readPostById(postId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<UpdatePostResponse> postUpdate(@PathVariable Long postId,
+                                                         @RequestBody UpdatePostRequest request){
+
+        UpdatePostResponse response = postService.updatePost(postId, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+    }
+
+    // 삭제
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<DeletePostResponse> postDelete(@PathVariable Long postId){
+        DeletePostResponse response = postService.deletePost(postId);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // 전체 조회
+    @GetMapping
+    public ResponseEntity<Page<ReadPostResponse>> postReadAll(
+            // 페이지처리할때 설정값
+            // 최신순으로 5개씩 역순으로(Sort.Direction.DESC)
+            @PageableDefault(size = 5, sort = "postId", direction = Sort.Direction.DESC)
+
+            Pageable pageable){
+
+            Page<ReadPostResponse> responses = postService.readAllPost(pageable);
+
+            return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 }
