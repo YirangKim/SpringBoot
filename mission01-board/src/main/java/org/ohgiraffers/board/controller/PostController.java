@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.*;
 @ResponseBody
 @RestController
 // @RequestMapping : 특정 URL을 매핑하게 도와준다
-@RequestMapping("/api/v1/posts") // 1) 클라이언트 요청 /api/v1/posts 경로로 POST 요청
+@RequestMapping("/api/v1/posts") // RequestMapping 기본경로
 // @RequiredArgsConstructor : final을 혹은 @NonNull 어노테이션이 붙은 필드에 대한 생성자를 자동으로 생성해준다
 @RequiredArgsConstructor
 public class PostController {
@@ -51,47 +51,55 @@ public class PostController {
     // 2) PostController의 postCreate 메서드:
     @Tag(name = "게시물 작성", description = "Create")
     @Operation(summary = "게시글 작성", description = "제목")
-    @PostMapping
+    @PostMapping //post 요청
     public ResponseEntity<CreatePostResponse> postCreate(
-            @RequestBody CreatePostRequest request){ // 해당 메서드는 클라이언트가 보낸 데이터(title과 content)를 담은 CreatePostRequest 객체를 받는다
+            @RequestBody CreatePostRequest request){ // request 형식 요청
 
+        // request 요청한 것을 postService.createPost(request) 받고
+        //
+        // CreatePostResponse response 만들어내서
         CreatePostResponse response = postService.createPost(request);
-
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        // return
+        return new ResponseEntity<>(response, HttpStatus.OK); //연결에 대한 상태
     }
 
+    //단건 조회
     @Tag(name = "게시물 단건 조회", description = "Read")
-    @GetMapping("/{postId}")
+    @GetMapping("/{postId}") //get
     public ResponseEntity<ReadPostResponse> postRead(@PathVariable Long postId){
-        ReadPostResponse response = postService.readPostById(postId);
 
+        // postService에서 readPostById실행
+        ReadPostResponse response = postService.readPostById(postId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     //수정
     @Tag(name = "게시물 수정", description = "Update")
-    @PutMapping("/{postId}")
-    public ResponseEntity<UpdatePostResponse> postUpdate(@PathVariable Long postId,
-                                                         @RequestBody UpdatePostRequest request){
+    @PutMapping("/{postId}") //Put 요청.
+    public ResponseEntity<UpdatePostResponse> postUpdate(@PathVariable Long postId, //postId 받음
+                                                         @RequestBody UpdatePostRequest request){ //형식 요청
 
+        // 1 postService.updatePost(postId, request) 받고
+        // 2 UpdatePostResponse response 응답, 만듬
         UpdatePostResponse response = postService.updatePost(postId, request);
+
+        // response을 return
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 
     // 삭제
     @Tag(name = "게시물 삭제", description = "Delete")
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/{postId}") // Delete /api/v1/posts/{postId}
     public ResponseEntity<DeletePostResponse> postDelete(@PathVariable Long postId){
-        DeletePostResponse response = postService.deletePost(postId);
 
+        DeletePostResponse response = postService.deletePost(postId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 전체 조회
     @Tag(name = "게시물 전체조회", description = "ReadAll")
-    @GetMapping
+    @GetMapping // get
     public ResponseEntity<Page<ReadPostResponse>> postReadAll(
             // 페이지처리할때 설정값
             // 최신순으로 5개씩 역순으로(Sort.Direction.DESC)

@@ -60,6 +60,7 @@ public class PostService {
         return new ReadPostResponse(foundPost.getPostId(), foundPost.getTitle(), foundPost.getContent());
     }
 
+    //수정
     @Transactional //DB commit .... 공부필요
     // post맨은 반영, DB에 반영안됐던 문제 Transactional
     public UpdatePostResponse updatePost(Long postId, UpdatePostRequest request){
@@ -72,9 +73,12 @@ public class PostService {
         // Dirty Checking
         // 바꿔온 엔티티를 jps가 감지하고 바꿔줌
         foundPost.update(request.getTitle(), request.getContent());
+
+
         return new UpdatePostResponse(foundPost.getPostId(), foundPost.getTitle(), foundPost.getContent());
     }
 
+    //삭제
     @Transactional
     public DeletePostResponse deletePost(Long postId){
         Post foundPost = postRepository.findById(postId)
@@ -82,6 +86,8 @@ public class PostService {
         postRepository.delete(foundPost);
         return new DeletePostResponse(foundPost.getPostId());
     }
+
+
 
     // 조회
     public Page<ReadPostResponse> readAllPost(Pageable pageable){

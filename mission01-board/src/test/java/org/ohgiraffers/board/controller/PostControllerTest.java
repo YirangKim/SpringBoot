@@ -1,4 +1,4 @@
-package controller;
+package org.ohgiraffers.board.controller;
 
 /* 통합테스트 단위테스트
 * 통합테스트 :
@@ -87,7 +87,7 @@ public class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(1L)) //$.어쩌구 json 형식
                 .andExpect(jsonPath("$.title").value("테스트 제목"))
-                .andExpect(jsonPath("$.title").value("테스트 내용"))
+                .andExpect(jsonPath("$.content").value("테스트 내용"))
                 .andDo(print());
     }
 
@@ -104,11 +104,11 @@ public class PostControllerTest {
         given(postService.readPostById(any())).willReturn(response);
 
         //when & then
-        mockMvc.perform(get("/api/v1/posts/{postId}"))
+        mockMvc.perform(get("/api/v1/posts/{postId}", postId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(1L))
                 .andExpect(jsonPath("$.title").value("테스트 제목"))
-                .andExpect(jsonPath("$.title").value("테스트 내용"))
+                .andExpect(jsonPath("$.content").value("테스트 내용"))
                 .andDo(print());
 
     }
@@ -121,20 +121,20 @@ public class PostControllerTest {
 
         //given
         Long postId = 1L;
-        UpdatePostRequest request = new UpdatePostRequest("변경 테스트 제목", "변경 테스트 내용");
-        UpdatePostResponse response = new UpdatePostResponse(1L,"변경 테스트 제목", "변경 테스트 내용");
+        UpdatePostRequest request = new UpdatePostRequest("변경 제목", "변경 내용");
+        UpdatePostResponse response = new UpdatePostResponse(1L, "변경 제목", "변경 내용");
 
         given(postService.updatePost(any(Long.class), any(UpdatePostRequest.class))).willReturn(response);
 
         //when & then
-        mockMvc.perform(get("/api/v1/posts/{postId}", postId)
+        mockMvc.perform(put("/api/v1/posts/{postId}", postId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(request))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(1L))
-                .andExpect(jsonPath("$.title").value("변경 테스트 제목"))
-                .andExpect(jsonPath("$.content").value("변경 테스트 내용"))
+                .andExpect(jsonPath("$.title").value("변경 제목"))
+                .andExpect(jsonPath("$.content").value("변경 내용"))
                 .andDo(print());
     }
 
@@ -146,10 +146,10 @@ public class PostControllerTest {
         //given
         Long postId = 1L;
         DeletePostResponse deletePostResponse = new DeletePostResponse(postId);
-        given(postService.deletePost(any())).willReturn(deletePostResponse);
+        given(postService.deletePost(any(Long.class))).willReturn(deletePostResponse);
 
         //when & then
-        mockMvc.perform(delete("/api/v1/posts/{postId}, postId"))
+        mockMvc.perform(delete("/api/v1/posts/{postId}", postId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(1L))
                 .andDo(print());
@@ -163,21 +163,21 @@ public class PostControllerTest {
         //given
         int page = 0;
         int size = 5;
-        PageRequest pageRequest = PageRequest.of(page, size);
-        ReadPostResponse readPostResponse = new ReadPostResponse(1L,"테스트 제목", "테스트 내용");
-        List<ReadPostResponse> responses =  new ArrayList<>();
+        PageRequest pageRequest = PageRequest.of(page,size);
+        ReadPostResponse readPostResponse = new ReadPostResponse(1L, "테스트 제목", "테스트 내용");
+        List<ReadPostResponse> responses = new ArrayList<>();
         responses.add(readPostResponse);
 
-        Page<ReadPostResponse> pageResponse = new PageImpl<>(responses, pageRequest, responses.size());
+        Page<ReadPostResponse> pageResponses = new PageImpl<>(responses, pageRequest, responses.size());
 
-        given(postService.readAllPost(any())).willReturn(pageResponse);
+        given(postService.readAllPost(any())).willReturn(pageResponses);
 
         //when & then
-        mockMvc.perform(get("/api/v1/posts/"))
+        mockMvc.perform(get("/api/v1/posts"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].postId").value(readPostResponse.getPostId())) //비교
+                .andExpect(jsonPath("$.content[0].postId").value(readPostResponse.getPostId()))
                 .andExpect(jsonPath("$.content[0].title").value(readPostResponse.getTitle()))
-                .andExpect(jsonPath("$.content[0].content").value(readPostResponse.getTitle()))
+                .andExpect(jsonPath("$.content[0].content").value(readPostResponse.getContent()))
                 .andDo(print());
     }
 
