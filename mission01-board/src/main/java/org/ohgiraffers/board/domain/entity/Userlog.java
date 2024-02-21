@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor( access = AccessLevel.PROTECTED)
-public class User_log {
+public class Userlog {
 
     @Id
     @GeneratedValue
