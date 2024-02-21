@@ -2,7 +2,7 @@ package org.ohgiraffers.board.service;
 
 import lombok.RequiredArgsConstructor;
 import org.ohgiraffers.board.domain.dto.*;
-import org.ohgiraffers.board.domain.entity.Post;
+import org.ohgiraffers.board.domain.entity.User_log;
 import org.ohgiraffers.board.repository.BloodRepository;
 import org.ohgiraffers.board.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,6 @@ public class BloodService {
                 .name(request.getName())
                 .profile_im(request.getProfile_im())
                 .age(request.getAge())
-                .age(request.getAge())
                 .weight(request.getWeight())
                 .height(request.getHeight())
                 .gender(request.getGender())
@@ -33,6 +32,7 @@ public class BloodService {
 
         User_log saveBlood = bloodRepository.save(user_log); //save return값을 돌려줌
 
-        return new CreateUserLogResponse(saveBlood.getName(), saveBlood.getTitle(), saveBlood.getContent());
+        return new CreateUserLogResponce(saveBlood.getName(), saveBlood.getProfile_im(), saveBlood.getAge(),
+                saveBlood.getWeight(), saveBlood.getHeight(), saveBlood.getGender(), saveBlood.getAvblood(), saveBlood.getAfterblood());
     }
 }
