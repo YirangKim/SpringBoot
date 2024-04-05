@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 @Builder
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tbl_menu")
@@ -69,9 +70,10 @@ public class Menu {
 //        this.orderableStatus = orderableStatus;
 //    }
 
-    @Override
-    public String toString() {
-        return "Menu [menuCode=" + menuCode + ", menuName=" + menuName + ", menuPrice=" + menuPrice
-                + ", categoryCode=" + categoryCode + ", orderableStatus=" + orderableStatus + "]";
-    }
+    // @ToString 어노테이션
+//    @Override
+//    public String toString() {
+//        return "Menu [menuCode=" + menuCode + ", menuName=" + menuName + ", menuPrice=" + menuPrice
+//                + ", categoryCode=" + categoryCode + ", orderableStatus=" + orderableStatus + "]";
+//    }
 }
