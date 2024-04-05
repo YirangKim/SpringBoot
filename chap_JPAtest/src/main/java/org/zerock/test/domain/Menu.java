@@ -1,12 +1,18 @@
 package org.zerock.test.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
 //Entity 생성
 //JPA를 사용할 것이므로 테이블 tbl_menu 와 매핑 될 Menu Entity를 생성
 @Log4j2
 @Entity
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "tbl_menu")
 public class Menu {
 
@@ -23,57 +29,45 @@ public class Menu {
     @Column(name="orderable_status")
     private String orderableStatus;
 
-    public Menu(){}
-
-    public Menu(int menuCode, String menuName, int menuPrice, int categoryCode,
-                String orderableStatus) {
-        super();
-        this.menuCode = menuCode;
-        this.menuName = menuName;
-        this.menuPrice = menuPrice;
-        this.categoryCode = categoryCode;
-        this.orderableStatus = orderableStatus;
-    }
-
-    public int getMenuCode() {
-        return menuCode;
-    }
-
-    public void setMenuCode(int menuCode) {
-        this.menuCode = menuCode;
-    }
-
-    public String getMenuName() {
-        return menuName;
-    }
-
-    public void setMenuName(String menuName) {
-        this.menuName = menuName;
-    }
-
-    public int getMenuPrice() {
-        return menuPrice;
-    }
-
-    public void setMenuPrice(int menuPrice) {
-        this.menuPrice = menuPrice;
-    }
-
-    public int getCategoryCode() {
-        return categoryCode;
-    }
-
-    public void setCategoryCode(int categoryCode) {
-        this.categoryCode = categoryCode;
-    }
-
-    public String getOrderableStatus() {
-        return orderableStatus;
-    }
-
-    public void setOrderableStatus(String orderableStatus) {
-        this.orderableStatus = orderableStatus;
-    }
+//    public int getMenuCode() {
+//        return menuCode;
+//    }
+//
+//    public void setMenuCode(int menuCode) {
+//        this.menuCode = menuCode;
+//    }
+//
+//    public String getMenuName() {
+//        return menuName;
+//    }
+//
+//    public void setMenuName(String menuName) {
+//        this.menuName = menuName;
+//    }
+//
+//    public int getMenuPrice() {
+//        return menuPrice;
+//    }
+//
+//    public void setMenuPrice(int menuPrice) {
+//        this.menuPrice = menuPrice;
+//    }
+//
+//    public int getCategoryCode() {
+//        return categoryCode;
+//    }
+//
+//    public void setCategoryCode(int categoryCode) {
+//        this.categoryCode = categoryCode;
+//    }
+//
+//    public String getOrderableStatus() {
+//        return orderableStatus;
+//    }
+//
+//    public void setOrderableStatus(String orderableStatus) {
+//        this.orderableStatus = orderableStatus;
+//    }
 
     @Override
     public String toString() {
