@@ -5,8 +5,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.zerock.test.domain.Category;
 import org.zerock.test.domain.Menu;
+import org.zerock.test.dto.CategoryDTO;
 import org.zerock.test.dto.MenuDTO;
+import org.zerock.test.repository.CategoryRepository;
 import org.zerock.test.repository.MenuRepository;
 
 import java.util.List;
@@ -21,13 +27,18 @@ public class MenuService {
     //MenuRepository타입을 생성자 주입 받는
     private final MenuRepository menuRepository;
     private final ModelMapper modelMapper;
+   private final CategoryRepository categoryRepository;
 
     // MenuService에서 해당 빈을 의존성 주입 받아 쓰고 싶으므로
     // 생성자를 이용한 의존성 주입을 하도록 기존의 코드를 수정
-    public MenuService(MenuRepository menuRepository, ModelMapper modelMapper){
+    public MenuService(MenuRepository menuRepository, ModelMapper modelMapper, CategoryRepository categoryRepository){
         
         this.menuRepository = menuRepository;
         this.modelMapper = modelMapper;
+        /** 의존성 주입을 한 뒤 정의 된 findAllCategory 메소드를 호출
+         * 조회 결과로 반환 된 List<Category> 를 List<CategoryDTO> 변환해서 반환
+         * */
+        this.categoryRepository = categoryRepository;
     }
 
     // 메뉴 하나 조회
@@ -74,6 +85,23 @@ public class MenuService {
 
         Page<Menu> menuList = menuRepository.findAll(pageable);
         return menuList.map(menu -> modelMapper.map(menu, MenuDTO.class));
+    }
 
+    /** 전달 되는 가격을 초과하는 메뉴의 목록을 조회하는 메소드
+     *  조회 후 반환되는 List<Menu> 는 List<MenuDTO> 로 변환해서 반환
+     * */
+    public List<MenuDTO> findByMenuPrice(Integer menuPrice){
+        //List<Menu> menuList = menuRepository.findByMenuPriceGreaterThan(menuPrice);
+        //List<Menu> menuList = menuRepository.findByMenuPriceGreaterThanOrderByMenuPrice(menuPrice);
+
+        List<Menu> menuList = menuRepository.findByMenuPriceGreaterThan(menuPrice, Sort.by("menuPrice").descending());
+        return menuList.stream().map(menu -> modelMapper.map(menu, MenuDTO.class)).
+                collect(Collectors.toList());
+    }
+
+    //MenuService의 카테고리 목록 조회 메소드
+    public List<CategoryDTO> findAllCategory(){
+        List<Category> categoryList = categoryRepository.findAllCategory();
+        return categoryList.stream().map(category -> modelMapper.map(category, CategoryDTO.class)).collect(Collectors.toList());
     }
 }
