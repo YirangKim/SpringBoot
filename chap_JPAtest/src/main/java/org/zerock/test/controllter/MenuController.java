@@ -6,10 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.zerock.test.domain.Menu;
 import org.zerock.test.dto.CategoryDTO;
 import org.zerock.test.dto.MenuDTO;
+import org.zerock.test.repository.MenuRepository;
 import org.zerock.test.service.MenuService;
 import org.zerock.test.service.Pagenation;
 import org.zerock.test.service.PagingButtonInfo;
@@ -21,11 +24,13 @@ import java.util.List;
 @ToString
 @Log4j2
 @Controller //빈 스캐닝
+@Transactional
 @RequestMapping("/menu")
 public class MenuController {
 
     //MenuService 타입을 생성자 주입
     private final MenuService menuService;
+    private final MenuRepository menuRepository;
 
     @GetMapping("{menuCode}")
     public String findMenuByCode(@PathVariable int menuCode, Model model){
@@ -48,6 +53,7 @@ public class MenuController {
      * 현재 요청 페이지와 함께 노출 되어야 하는 시작 페이지와 끝 페이지를 계산
      * 이를 위해 PagingButtonInfo 클래스와 Pagenation 클래스를 작
      * */
+    @Transactional(readOnly = true) //조회
     @GetMapping("list")
     public String findMenuList(@PageableDefault(size = 5) Pageable pageable, Model model){
 
@@ -99,6 +105,7 @@ public class MenuController {
      * 기준에 맞는 메뉴 목록 조회를 요청한다.
      * List<MenuDTO> 는 Model 객체에 담고 menu/searchResult 뷰로 응답
      * */
+    @Transactional(readOnly = true) //조회
     @GetMapping("/search")
     public String findByMenuPrice(@RequestParam Integer menuPrice, Model model ){
         List<MenuDTO> menuList = menuService.findByMenuPrice(menuPrice);
@@ -124,6 +131,46 @@ public class MenuController {
     public List<CategoryDTO> findCategoryList() {
 
         return menuService.findAllCategory();
+
+    }
+
+    /** 메뉴등록
+     *  파라미터로 전달 받고 MenuService에 구현한 메소드를 호출
+     *  별도의 Exception 발생이 없었다면
+     *  클라이언트가 메뉴 목록을 조회하는 기능을 다시 요청할 수 있도록 redirect 처리
+     * */
+    @PostMapping("/regist")
+    public String registNewMenu(MenuDTO newMenu){
+        menuService.registNewMenu(newMenu);
+        log.info("newMenu 는: {}", newMenu);
+        return "redirect:/menu/list";
+    }
+
+    /** 메뉴 수정
+     *  @PostMapping 을 사용하고,  메뉴 코드, 메뉴 이름을 MenuDTO 타입으로 전달 받는다.
+     *  전달 받은 값을 MenuService에 구현한 메소드로 전달
+     *  별도의 Exception 발생이 없었다면
+     *  클라이언트가 수정한 메뉴의 상세 페이지를 볼 수 있도록 redirect
+     * */
+
+    @GetMapping("/modify")
+    public void modifyPage() {}
+
+    @PostMapping("/modify")
+    public String modifyMenu(MenuDTO modifyMenu){
+        menuService.modifyMenu(modifyMenu);
+        log.info("modifyMenu는 : {}", modifyMenu);
+        return "redirect:/menu/" + modifyMenu.getMenuCode();
+    }
+
+    //메뉴 삭제
+    @GetMapping("/delete")
+    public void deletePage() {}
+
+    @PostMapping("/delete")
+    public String deletMenu(@RequestParam Integer menuCode){
+        menuService.deleteMenu(menuCode);
+        return "redirect:/menu/list";
     }
 
 }

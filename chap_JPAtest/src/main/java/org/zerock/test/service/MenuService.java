@@ -1,10 +1,12 @@
 package org.zerock.test.service;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 // Service에서는 Repository에 구현 된 DB에 접근하는 여러 메소드들을 호출한 뒤
 // 해당 결과를 Controller로 리턴할 것이다
 // Menu Entity와 동일한 필드를 가지는 MenuDTO를 작성한다.
+@Log4j2
+@Transactional
 @Service
 public class MenuService {
 
@@ -42,6 +46,7 @@ public class MenuService {
     }
 
     // 메뉴 하나 조회
+    @Transactional(readOnly = true) //조회
     public MenuDTO findMenuByCode(int menuCode) {
         /** findById 메소드는 id 값을 전달하여 해당 id의 엔터티를 조회
          * findById 의 반환값은 Optional 타입
@@ -53,6 +58,7 @@ public class MenuService {
     }
 
     //메뉴 전체 조회
+    @Transactional(readOnly = true) //조회
     public List<MenuDTO> findMenulist(){
         /**전체 엔터티 조회 findAll 메소드
          * Sort.by 정렬, menuCode 필드 내림차순으로 처리
@@ -67,6 +73,7 @@ public class MenuService {
     }
 
     //페이징 처리
+    @Transactional(readOnly = true) //조회
     public Page<MenuDTO> findMenuList(Pageable pageable) {
         /**  Pageable 객체를 이용하면 페이징 처리와 정렬을 동시에 처리
          * Pageable 객체를 생성할 때 PageRequest.of 메소드를 이용하여 생성
@@ -90,6 +97,7 @@ public class MenuService {
     /** 전달 되는 가격을 초과하는 메뉴의 목록을 조회하는 메소드
      *  조회 후 반환되는 List<Menu> 는 List<MenuDTO> 로 변환해서 반환
      * */
+    @Transactional(readOnly = true) //조회
     public List<MenuDTO> findByMenuPrice(Integer menuPrice){
         //List<Menu> menuList = menuRepository.findByMenuPriceGreaterThan(menuPrice);
         //List<Menu> menuList = menuRepository.findByMenuPriceGreaterThanOrderByMenuPrice(menuPrice);
@@ -100,8 +108,41 @@ public class MenuService {
     }
 
     //MenuService의 카테고리 목록 조회 메소드
+    @Transactional(readOnly = true) //조회
     public List<CategoryDTO> findAllCategory(){
         List<Category> categoryList = categoryRepository.findAllCategory();
-        return categoryList.stream().map(category -> modelMapper.map(category, CategoryDTO.class)).collect(Collectors.toList());
+        // categoryList에 대한 로그 추가
+        log.info("Category list fetched: {}", categoryList);
+
+        return categoryList.stream().map(category -> modelMapper.map(category, CategoryDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    /**메뉴 등록
+     * save() 메소드를 통해 하나의 엔티티를 저장
+     * 전달 되어 오는 데이터는 MenuDTO 타입이므로 Menu Entity로 변환해서 처리
+     * DB 삽입, 수정, 삭제 로직은  @Transcational 어노테이션
+     * */
+    public void registNewMenu(MenuDTO newMenu){
+        menuRepository.save(modelMapper.map(newMenu, Menu.class));
+    }
+
+    /** 메뉴 수정
+     * 수정 할 대상 Entity를 먼저 조회
+     * 그리고 해당 객체를 setter 메소드를 적절히 사용하여 변경
+     * Exception 발생 없이 메소드가 종료 되면 commit 처리가 되며 변경 감지를 통해
+     * update 구문이 flush 된다
+     * */
+    public void modifyMenu(MenuDTO modifyMenu){
+        Menu foundMenu = menuRepository.findById(modifyMenu.getMenuCode()).orElseThrow(
+                IllegalArgumentException::new);
+        foundMenu.setMenuName(modifyMenu.getMenuName());
+    }
+
+    /** 메뉴 삭제
+     *  deleteById() 메소드에 id를 전달하여 처리
+     * */
+    public void deleteMenu(Integer menuCode){
+        menuRepository.deleteById(menuCode);
     }
 }

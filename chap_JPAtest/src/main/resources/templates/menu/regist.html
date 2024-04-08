@@ -9,7 +9,7 @@
 
 <form action="/menu/regist" method="post">
     <label>메뉴 이름 : </label><input type="text" name="menuName"><br>
-    <label>메뉴 가격 : </label><input type="text" name="menuName"><br>
+    <label>메뉴 가격 : </label><input type="text" name="menuPrice"><br>
     <label>카테 고리 </label>
     <select name="categoryCode" id="categoryCode">
         <!--
@@ -27,19 +27,20 @@
 따라서 JavaScript의 fetch 메소드를 통해서 서버에 비동기 통신을 요청한다. -->
 <script>
     fetch('/menu/category')
-    .then(res => res.json())
-    .then(data => {
-        const $categoryCode = decument.getElementById('categoryCode');
-        console.log($categoryCode)
+        .then(res => res.json())
+        .then(data => {
+            const $categoryCode = document.getElementById('categoryCode');
+            console.log($categoryCode)
 
-        for(let index in data){
-            const $option = document.createElement('option');
-            $option.value = data[index].categoryCode;
-            $option.textContent = data[index].categoryName;
+            for(let index in data){
+                const $option = document.createElement('option');
+                $option.value = data[index].categoryCode;
+                $option.textContent = data[index].categoryName;
 
-            $categoryCode.appendChild($option);
-        }
-    });
+                $categoryCode.appendChild($option);
+            }
+        });
 </script>
+
 </body>
 </html>
