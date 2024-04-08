@@ -7,9 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.zerock.test.dto.CategoryDTO;
 import org.zerock.test.dto.MenuDTO;
 import org.zerock.test.service.MenuService;
 import org.zerock.test.service.Pagenation;
@@ -91,8 +90,40 @@ public class MenuController {
 //        return "menu/list";
 //    }
 
-    /*쿼리 메소드 실행*/
+    //쿼리 메소드 실행
     @GetMapping("/querymethod")
     public void queryMethodPage() {}
+
+    /**전달 되는 가격을 초과하는 메뉴의 목록을 조회
+     * menuService.findByMenuPrice() 메서드로 기준 메뉴 가격을 전달하며
+     * 기준에 맞는 메뉴 목록 조회를 요청한다.
+     * List<MenuDTO> 는 Model 객체에 담고 menu/searchResult 뷰로 응답
+     * */
+    @GetMapping("/search")
+    public String findByMenuPrice(@RequestParam Integer menuPrice, Model model ){
+        List<MenuDTO> menuList = menuService.findByMenuPrice(menuPrice);
+
+        model.addAttribute("menuList", menuList);
+        model.addAttribute("menuPrice", menuPrice);
+
+        log.info("menuList: {}", menuList);
+        log.info("menuPrice: {}", menuPrice);
+
+        return "menu/searchResult";
+    }
+
+    //Create 등록
+    @GetMapping("/regist")
+    public void registPage() {}
+
+    /** MenuController의 카테고리 목록 조회 메소드
+     *  조회 된 List<CategoryDTO> 데이터를 응답하기 위해  @ResponseBody 어노테이션
+     *  */
+    @GetMapping(value="/category", produces="application/json; charset=UTF-8")
+    @ResponseBody
+    public List<CategoryDTO> findCategoryList() {
+
+        return menuService.findAllCategory();
+    }
 
 }
