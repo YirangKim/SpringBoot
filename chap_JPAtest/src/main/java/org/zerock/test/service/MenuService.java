@@ -124,7 +124,7 @@ public class MenuService {
      * DB 삽입, 수정, 삭제 로직은  @Transcational 어노테이션
      * */
     public void registNewMenu(MenuDTO newMenu){
-        menuRepository.save(modelMapper.map(newMenu, Menu.class));
+        menuRepository.save(modelMapper.map(newMenu, Menu.class)); //modelMapper 역할, 엔티티 필드, DTO 변수 매칭
     }
 
     /** 메뉴 수정
