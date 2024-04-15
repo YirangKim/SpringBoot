@@ -36,6 +36,7 @@ public class PostService {
 
     private final PostRepository postRepository;
 
+    // 등록
     // 3 PostService의 createPost 메서드 호출:
     // createPost 메서드는 받은 데이터로 새로운 게시물을 만들고, 이를 데이터베이스에 저장합니다.
     @Transactional
@@ -50,6 +51,7 @@ public class PostService {
         return new CreatePostResponse(savePost.getPostId(), savePost.getTitle(), savePost.getContent());
     }
 
+    //ID 조회
     public ReadPostResponse readPostById(Long postId){
 
         //postId있는지 없는지 체크
