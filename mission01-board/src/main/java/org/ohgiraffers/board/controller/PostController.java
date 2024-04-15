@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 * 앱의 장점을 최대한 활용 할 수 있는 아키텍쳐 스타일이다.
 * */
 
+@CrossOrigin(origins = "*")
 @Controller
 @ResponseBody
 @RestController
